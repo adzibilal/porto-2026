@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: #101010;
+  --color-foreground: #ededed;
+  --color-accent: #C6FF4A;
+  --color-accent-yellow: #F5E642;
+  --color-muted: #B8B8B8;
+  --color-subtle: #666;
+  --color-border: rgba(255, 255, 255, 0.12);
+  --color-card-bg: rgba(255, 255, 255, 0.08);
+  --font-sans: var(--font-plus-jakarta), system-ui, sans-serif;
+  --font-heading: var(--font-plus-jakarta), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), "JetBrains Mono", monospace;
+}
+
+body {
+  background: #101010;
+  color: #FFFFFF;
+  cursor: none;
+}
+
+a, button, input, textarea, select {
+  cursor: none;
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(8px); }
+}
+
+@utility marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 22s linear infinite;
+}
