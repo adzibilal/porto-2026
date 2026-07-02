@@ -9,26 +9,26 @@ gsap.registerPlugin(ScrollTrigger);
 
 const entries = [
   {
-    period: "Jan 2025 — Present",
+    period: "Jan 2025 · Present",
     title: "Acclime",
     subtitle: "Frontend Developer · Full-time · Hybrid · South Jakarta",
     dot: "bg-accent",
   },
   {
-    period: "Oct 2023 — Jan 2025",
+    period: "Oct 2023 · Jan 2025",
     title: "PT Motiolabs Digital Indonesia",
     subtitle: "Frontend Developer · Contract · On-site · Bandung",
     desc: "JavaScript · Vue.js",
     dot: "bg-accent",
   },
   {
-    period: "Jul 2022 — Oct 2023",
+    period: "Jul 2022 · Oct 2023",
     title: "PT Jumpa Daring Indonesia",
     subtitle: "Frontend Developer · Contract",
     dot: "bg-accent-yellow",
   },
   {
-    period: "Oct 2019 — Dec 2022",
+    period: "Oct 2019 · Dec 2022",
     title: "Bara Enterprise",
     subtitle: "Frontend Developer · Contract · Bandung",
     dot: "bg-accent",

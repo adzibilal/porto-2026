@@ -18,7 +18,7 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Adzi Bilal — Frontend Engineer",
+  title: "Adzi Bilal · Frontend Engineer",
   description:
     "pixel-pushing, bug-squashing frontend engineer. i build fast, expressive interfaces.",
 };

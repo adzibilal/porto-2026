@@ -104,17 +104,16 @@ export default function About() {
         </TextReveal>
         <TextReveal delay={0.15}>
           <p className="text-[16px] leading-[1.65] text-muted max-w-[560px] mb-6">
-            i started out building landing pages and product UIs with plain
-            html, css &amp; javascript, then moved into react and next.js as
-            projects grew. these days i split my time between shipping clean,
-            fast frontends and sweating over the small interaction details most
-            people never notice — but always feel.
+            the best interfaces don&apos;t announce themselves. they
+            disappear. my job is to make sure the only thing you notice
+            is how effortlessly things just work and maybe a
+            well-placed micro-motion you can&apos;t quite put your finger on.
           </p>
         </TextReveal>
         <div ref={statsRef} className="flex gap-8 flex-wrap">
           <div>
             <div className="font-heading font-bold text-[26px] text-accent">
-              3+
+              7+
             </div>
             <div className="text-[12px] text-muted lowercase mt-[2px]">
               years building for the web
@@ -122,7 +121,7 @@ export default function About() {
           </div>
           <div>
             <div className="font-heading font-bold text-[26px] text-accent">
-              10+
+              50+
             </div>
             <div className="text-[12px] text-muted lowercase mt-[2px]">
               sites &amp; landing pages shipped

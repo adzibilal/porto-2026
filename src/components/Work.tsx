@@ -9,7 +9,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 const projects = [
   {
-    title: "bara enterprise — landing page",
+    title: "bara enterprise · landing page",
     desc: "html · css · javascript · agency landing page",
     tags: ["frontend", "marketing"],
   },

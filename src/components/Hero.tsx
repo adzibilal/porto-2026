@@ -87,7 +87,7 @@ export default function Hero() {
           ref={descRef}
           className="mt-7 max-w-[520px] text-[16px] leading-[1.6] text-muted"
         >
-          i build fast, expressive interfaces — from landing pages that convert
+          i build fast, expressive interfaces from landing pages that convert
           to product UIs that don&apos;t fall apart on mobile.
         </p>
 
