@@ -19,7 +19,7 @@ type Project = {
 function SkeletonCard() {
   return (
     <div className="project-card border border-border rounded-[14px] overflow-hidden animate-pulse">
-      <div className="h-[200px] bg-[#1c1c1c]" />
+      <div className="aspect-video bg-[#1c1c1c]" />
       <div className="p-5 space-y-3">
         <div className="h-5 bg-[#1c1c1c] rounded w-3/4" />
         <div className="h-3 bg-[#1c1c1c] rounded w-full" />
@@ -100,7 +100,7 @@ export default function Work() {
                 rel="noopener noreferrer"
                 className={`project-card block border border-border rounded-[14px] overflow-hidden transition-colors duration-200 group ${p.url ? "hover:border-accent cursor-pointer" : "cursor-default"}`}
               >
-                <div className="relative h-[200px] bg-[repeating-linear-gradient(45deg,#1c1c1c,#1c1c1c_10px,#181818_10px,#181818_20px)] flex items-center justify-center font-mono text-[11px] text-subtle overflow-hidden">
+                <div className="relative aspect-video bg-[repeating-linear-gradient(45deg,#1c1c1c,#1c1c1c_10px,#181818_10px,#181818_20px)] flex items-center justify-center font-mono text-[11px] text-subtle overflow-hidden">
                   {p.image ? (
                     <Image src={p.image} alt={p.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, 400px" />
                   ) : (
