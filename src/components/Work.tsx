@@ -1,33 +1,48 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import TextReveal from "./TextReveal";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const projects = [
+const fallback = [
   {
     title: "bara enterprise · landing page",
     desc: "html · css · javascript · agency landing page",
     tags: ["frontend", "marketing"],
+    image: "",
+    url: "",
   },
   {
     title: "saas analytics dashboard",
     desc: "react · typescript · data viz",
     tags: ["product", "dashboard"],
+    image: "",
+    url: "",
   },
   {
     title: "mobile app landing page",
     desc: "next.js · tailwind · marketing site",
     tags: ["frontend", "marketing"],
+    image: "",
+    url: "",
   },
 ];
 
 export default function Work() {
   const sectionRef = useRef<HTMLElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
+  const [projects, setProjects] = useState(fallback);
+
+  useEffect(() => {
+    fetch("/api/projects")
+      .then((r) => r.json())
+      .then((data) => { if (data.length > 0) setProjects(data); })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -54,7 +69,7 @@ export default function Work() {
       );
     });
     return () => ctx.revert();
-  }, []);
+  }, [projects]);
 
   return (
     <section
@@ -67,23 +82,32 @@ export default function Work() {
           <h2 className="font-heading font-semibold text-[clamp(24px,3vw,28px)] text-white lowercase">
             selected work
           </h2>
-          <span className="text-[13px] text-muted lowercase">04 projects</span>
+          <span className="text-[13px] text-muted lowercase">{String(projects.length).padStart(2, "0")} projects</span>
         </div>
       </TextReveal>
 
       <div ref={cardsRef} className="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] gap-6">
         {projects.map((p, i) => (
-          <div
+          <a
             key={p.title}
-            className="project-card border border-border rounded-[14px] overflow-hidden hover:border-accent transition-colors duration-200 group"
+            href={p.url || undefined}
+            target={p.url ? "_blank" : undefined}
+            rel="noopener noreferrer"
+            className={`project-card block border border-border rounded-[14px] overflow-hidden transition-colors duration-200 group ${p.url ? "hover:border-accent cursor-pointer" : "cursor-default"}`}
           >
             <div className="relative h-[200px] bg-[repeating-linear-gradient(45deg,#1c1c1c,#1c1c1c_10px,#181818_10px,#181818_20px)] flex items-center justify-center font-mono text-[11px] text-subtle overflow-hidden">
-              project screenshot
-              <div className="absolute inset-0 bg-[rgba(198,255,74,0.9)] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-250">
-                <span className="font-sans font-bold text-[#101010] text-[14px] lowercase">
-                  view project →
-                </span>
-              </div>
+              {p.image ? (
+                <Image src={p.image} alt={p.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, 400px" />
+              ) : (
+                "project screenshot"
+              )}
+              {p.url && (
+                <div className="absolute inset-0 bg-[rgba(198,255,74,0.9)] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-250">
+                  <span className="font-sans font-bold text-[#101010] text-[14px] lowercase">
+                    view project →
+                  </span>
+                </div>
+              )}
             </div>
             <div className="p-5">
               <h3 className="font-heading font-semibold text-[19px] text-white lowercase mb-[6px]">
@@ -101,7 +125,7 @@ export default function Work() {
                 ))}
               </div>
             </div>
-          </div>
+          </a>
         ))}
 
         <div className="project-card border border-dashed border-[rgba(255,255,255,0.25)] rounded-[14px] flex items-center justify-center min-h-[200px] hover:border-accent transition-colors duration-200">
