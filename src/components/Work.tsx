@@ -8,40 +8,43 @@ import TextReveal from "./TextReveal";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const fallback = [
-  {
-    title: "bara enterprise · landing page",
-    desc: "html · css · javascript · agency landing page",
-    tags: ["frontend", "marketing"],
-    image: "",
-    url: "",
-  },
-  {
-    title: "saas analytics dashboard",
-    desc: "react · typescript · data viz",
-    tags: ["product", "dashboard"],
-    image: "",
-    url: "",
-  },
-  {
-    title: "mobile app landing page",
-    desc: "next.js · tailwind · marketing site",
-    tags: ["frontend", "marketing"],
-    image: "",
-    url: "",
-  },
-];
+type Project = {
+  title: string;
+  desc: string;
+  tags: string[];
+  image: string;
+  url: string;
+};
+
+function SkeletonCard() {
+  return (
+    <div className="project-card border border-border rounded-[14px] overflow-hidden animate-pulse">
+      <div className="h-[200px] bg-[#1c1c1c]" />
+      <div className="p-5 space-y-3">
+        <div className="h-5 bg-[#1c1c1c] rounded w-3/4" />
+        <div className="h-3 bg-[#1c1c1c] rounded w-full" />
+        <div className="flex gap-2">
+          <div className="h-5 bg-[#1c1c1c] rounded-full w-16" />
+          <div className="h-5 bg-[#1c1c1c] rounded-full w-20" />
+          <div className="h-5 bg-[#1c1c1c] rounded-full w-14" />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function Work() {
   const sectionRef = useRef<HTMLElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
-  const [projects, setProjects] = useState(fallback);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch("/api/projects")
-      .then((r) => r.json())
-      .then((data) => { if (data.length > 0) setProjects(data); })
-      .catch(() => {});
+      .then((r) => (r.ok ? r.json() : []))
+      .then(setProjects)
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
@@ -87,57 +90,48 @@ export default function Work() {
       </TextReveal>
 
       <div ref={cardsRef} className="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] gap-6">
-        {projects.map((p, i) => (
-          <a
-            key={p.title}
-            href={p.url || undefined}
-            target={p.url ? "_blank" : undefined}
-            rel="noopener noreferrer"
-            className={`project-card block border border-border rounded-[14px] overflow-hidden transition-colors duration-200 group ${p.url ? "hover:border-accent cursor-pointer" : "cursor-default"}`}
-          >
-            <div className="relative h-[200px] bg-[repeating-linear-gradient(45deg,#1c1c1c,#1c1c1c_10px,#181818_10px,#181818_20px)] flex items-center justify-center font-mono text-[11px] text-subtle overflow-hidden">
-              {p.image ? (
-                <Image src={p.image} alt={p.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, 400px" />
-              ) : (
-                "project screenshot"
-              )}
-              {p.url && (
-                <div className="absolute inset-0 bg-[rgba(198,255,74,0.9)] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-250">
-                  <span className="font-sans font-bold text-[#101010] text-[14px] lowercase">
-                    view project →
-                  </span>
+        {loading
+          ? Array.from({ length: 3 }).map((_, i) => <SkeletonCard key={i} />)
+          : projects.map((p) => (
+              <a
+                key={p.title}
+                href={p.url || undefined}
+                target={p.url ? "_blank" : undefined}
+                rel="noopener noreferrer"
+                className={`project-card block border border-border rounded-[14px] overflow-hidden transition-colors duration-200 group ${p.url ? "hover:border-accent cursor-pointer" : "cursor-default"}`}
+              >
+                <div className="relative h-[200px] bg-[repeating-linear-gradient(45deg,#1c1c1c,#1c1c1c_10px,#181818_10px,#181818_20px)] flex items-center justify-center font-mono text-[11px] text-subtle overflow-hidden">
+                  {p.image ? (
+                    <Image src={p.image} alt={p.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, 400px" />
+                  ) : (
+                    "project screenshot"
+                  )}
+                  {p.url && (
+                    <div className="absolute inset-0 bg-[rgba(198,255,74,0.9)] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-250">
+                      <span className="font-sans font-bold text-[#101010] text-[14px] lowercase">
+                        view project →
+                      </span>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-            <div className="p-5">
-              <h3 className="font-heading font-semibold text-[19px] text-white lowercase mb-[6px]">
-                {p.title}
-              </h3>
-              <p className="text-[13px] text-muted mb-3">{p.desc}</p>
-              <div className="flex gap-2">
-                {p.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="text-[11px] px-[10px] py-[4px] rounded-full bg-card-bg text-muted"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </a>
-        ))}
-
-        <div className="project-card border border-dashed border-[rgba(255,255,255,0.25)] rounded-[14px] flex items-center justify-center min-h-[200px] hover:border-accent transition-colors duration-200">
-          <div className="text-center p-5">
-            <div className="font-mono text-[12px] text-subtle mb-[6px]">
-              + add project
-            </div>
-            <div className="text-[13px] text-muted">
-              drop your 4th case study here
-            </div>
-          </div>
-        </div>
+                <div className="p-5">
+                  <h3 className="font-heading font-semibold text-[19px] text-white lowercase mb-[6px]">
+                    {p.title}
+                  </h3>
+                  <p className="text-[13px] text-muted mb-3">{p.desc}</p>
+                  <div className="flex gap-2">
+                    {p.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="text-[11px] px-[10px] py-[4px] rounded-full bg-card-bg text-muted"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </a>
+            ))}
       </div>
     </section>
   );
