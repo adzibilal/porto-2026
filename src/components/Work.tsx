@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import TextReveal from "./TextReveal";
@@ -9,12 +10,22 @@ import TextReveal from "./TextReveal";
 gsap.registerPlugin(ScrollTrigger);
 
 type Project = {
+  slug: string;
   title: string;
   desc: string;
   tags: string[];
   image: string;
   url: string;
+  problem?: string;
+  approach?: string;
+  result?: string;
+  images?: string[];
 };
+
+/** a project earns a detail page once it has any case-study content */
+function hasDetail(p: Project) {
+  return !!(p.problem || p.approach || p.result || p.images?.length);
+}
 
 function SkeletonCard() {
   return (
@@ -30,6 +41,70 @@ function SkeletonCard() {
         </div>
       </div>
     </div>
+  );
+}
+
+function Card({ p }: { p: Project }) {
+  const detail = hasDetail(p);
+  const href = detail ? `/work/${p.slug}` : p.url;
+  const linked = !!href;
+
+  const body = (
+    <>
+      <div className="relative aspect-video bg-[repeating-linear-gradient(45deg,#1c1c1c,#1c1c1c_10px,#181818_10px,#181818_20px)] flex items-center justify-center font-mono text-[11px] text-subtle overflow-hidden">
+        {p.image ? (
+          <Image src={p.image} alt={p.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, 400px" />
+        ) : (
+          "project screenshot"
+        )}
+        {linked && (
+          <div className="absolute inset-0 bg-[rgba(198,255,74,0.9)] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-250">
+            <span className="font-sans font-bold text-[#101010] text-[14px] lowercase">
+              {detail ? "read case study →" : "view project →"}
+            </span>
+          </div>
+        )}
+      </div>
+      <div className="p-5">
+        <h3 className="font-heading font-semibold text-[19px] text-white lowercase mb-[6px]">
+          {p.title}
+        </h3>
+        <p className="text-[13px] text-muted mb-3">{p.desc}</p>
+        <div className="flex flex-wrap gap-2">
+          {p.tags.map((tag) => (
+            <span
+              key={tag}
+              className="text-[11px] px-[10px] py-[4px] rounded-full bg-card-bg text-muted"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+
+  const cls = `project-card block border border-border rounded-[14px] overflow-hidden transition-colors duration-200 group ${
+    linked ? "hover:border-accent cursor-pointer" : "cursor-default"
+  }`;
+
+  if (detail) {
+    return (
+      <Link href={href} className={cls}>
+        {body}
+      </Link>
+    );
+  }
+
+  return (
+    <a
+      href={href || undefined}
+      target={href ? "_blank" : undefined}
+      rel="noopener noreferrer"
+      className={cls}
+    >
+      {body}
+    </a>
   );
 }
 
@@ -92,46 +167,7 @@ export default function Work() {
       <div ref={cardsRef} className="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] gap-6">
         {loading
           ? Array.from({ length: 3 }).map((_, i) => <SkeletonCard key={i} />)
-          : projects.map((p) => (
-              <a
-                key={p.title}
-                href={p.url || undefined}
-                target={p.url ? "_blank" : undefined}
-                rel="noopener noreferrer"
-                className={`project-card block border border-border rounded-[14px] overflow-hidden transition-colors duration-200 group ${p.url ? "hover:border-accent cursor-pointer" : "cursor-default"}`}
-              >
-                <div className="relative aspect-video bg-[repeating-linear-gradient(45deg,#1c1c1c,#1c1c1c_10px,#181818_10px,#181818_20px)] flex items-center justify-center font-mono text-[11px] text-subtle overflow-hidden">
-                  {p.image ? (
-                    <Image src={p.image} alt={p.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, 400px" />
-                  ) : (
-                    "project screenshot"
-                  )}
-                  {p.url && (
-                    <div className="absolute inset-0 bg-[rgba(198,255,74,0.9)] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-250">
-                      <span className="font-sans font-bold text-[#101010] text-[14px] lowercase">
-                        view project →
-                      </span>
-                    </div>
-                  )}
-                </div>
-                <div className="p-5">
-                  <h3 className="font-heading font-semibold text-[19px] text-white lowercase mb-[6px]">
-                    {p.title}
-                  </h3>
-                  <p className="text-[13px] text-muted mb-3">{p.desc}</p>
-                  <div className="flex gap-2">
-                    {p.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="text-[11px] px-[10px] py-[4px] rounded-full bg-card-bg text-muted"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </a>
-            ))}
+          : projects.map((p) => <Card key={p.slug || p.title} p={p} />)}
       </div>
     </section>
   );

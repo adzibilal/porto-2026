@@ -1,12 +1,16 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 
 export default function CustomCursor() {
   const dotRef = useRef<HTMLDivElement>(null);
   const ringRef = useRef<HTMLDivElement>(null);
+  // ponytail: admin is a form, not a showpiece — a real cursor beats a fancy one
+  const isAdmin = usePathname()?.startsWith("/admin") ?? false;
 
   useEffect(() => {
+    if (isAdmin) return;
     let mouseX = 0;
     let mouseY = 0;
     let ringX = 0;
@@ -51,7 +55,9 @@ export default function CustomCursor() {
         el.removeEventListener("mouseleave", handleLeave);
       });
     };
-  }, []);
+  }, [isAdmin]);
+
+  if (isAdmin) return null;
 
   return (
     <>

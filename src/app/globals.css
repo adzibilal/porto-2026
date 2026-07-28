@@ -24,6 +24,25 @@ a, button, input, textarea, select {
   cursor: none;
 }
 
+/* admin runs without the custom cursor, so give inputs their native affordances back */
+.native-cursor,
+.native-cursor * {
+  cursor: auto;
+}
+.native-cursor a,
+.native-cursor button,
+.native-cursor label,
+.native-cursor select {
+  cursor: pointer;
+}
+.native-cursor input,
+.native-cursor textarea {
+  cursor: text;
+}
+.native-cursor button:disabled {
+  cursor: not-allowed;
+}
+
 @keyframes marquee {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
