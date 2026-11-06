@@ -1,29 +1,19 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { eq } from "drizzle-orm";
-import { getDb } from "@/db";
-import { projects } from "@/db/schema";
+import { getProject, getProjectSlugs } from "@/data/projects";
+import ProjectThumb from "@/components/ProjectThumb";
 
-async function getProject(slug: string) {
-  try {
-    const [row] = await getDb().select().from(projects).where(eq(projects.slug, slug)).limit(1);
-    return row ?? null;
-  } catch {
-    return null;
-  }
+export function generateStaticParams() {
+  return getProjectSlugs().map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: PageProps<"/work/[slug]">) {
   const { slug } = await params;
-  const p = await getProject(slug);
+  const p = getProject(slug);
   if (!p) return { title: "not found · adzi bilal" };
   return {
     title: `${p.title} · adzi bilal`,
     description: p.desc || undefined,
-    openGraph: p.image ? { images: [p.image] } : undefined,
-    // drafts stay reachable by direct link for previewing, but out of search
-    robots: p.active ? undefined : { index: false, follow: false },
   };
 }
 
@@ -43,22 +33,16 @@ function Block({ label, body }: { label: string; body: string }) {
 
 export default async function WorkDetail({ params }: PageProps<"/work/[slug]">) {
   const { slug } = await params;
-  const p = await getProject(slug);
+  const p = getProject(slug);
   if (!p) notFound();
 
   const stack = p.stack ?? [];
-  const gallery = (p.images ?? []).filter(Boolean);
+  const hasCaseStudy = !!(p.problem || p.approach || p.result || stack.length);
+
+  if (!hasCaseStudy) notFound();
 
   return (
     <main className="px-[clamp(24px,6vw,56px)] py-[clamp(32px,6vh,64px)] max-w-[1000px] mx-auto">
-      {!p.active && (
-        <div className="mb-6 rounded-lg border border-amber-400/25 bg-amber-400/5 px-4 py-3">
-          <p className="font-mono text-[11px] text-amber-400">
-            draft — not listed on the homepage and not indexed by search engines
-          </p>
-        </div>
-      )}
-
       <Link
         href="/#work"
         className="inline-flex items-center gap-2 font-mono text-[12px] text-muted hover:text-accent transition-colors"
@@ -96,18 +80,9 @@ export default async function WorkDetail({ params }: PageProps<"/work/[slug]">) 
         </div>
       </header>
 
-      {p.image && (
-        <div className="relative aspect-video rounded-[14px] overflow-hidden border border-border mb-12">
-          <Image
-            src={p.image}
-            alt={p.title}
-            fill
-            className="object-cover"
-            sizes="(max-width: 1000px) 100vw, 1000px"
-            priority
-          />
-        </div>
-      )}
+      <div className="rounded-[14px] overflow-hidden border border-border mb-12">
+        <ProjectThumb title={p.title} tags={p.tags} />
+      </div>
 
       <div className="space-y-8">
         <Block label="the problem" body={p.problem ?? ""} />
@@ -132,30 +107,6 @@ export default async function WorkDetail({ params }: PageProps<"/work/[slug]">) 
           </div>
         )}
       </div>
-
-      {gallery.length > 0 && (
-        <div className="mt-12 border-t border-border pt-8">
-          <h2 className="font-mono text-[11px] uppercase tracking-[0.14em] text-accent mb-5">
-            screens
-          </h2>
-          <div className="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-4">
-            {gallery.map((src) => (
-              <div
-                key={src}
-                className="relative aspect-video rounded-[10px] overflow-hidden border border-border"
-              >
-                <Image
-                  src={src}
-                  alt={p.title}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, 480px"
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
 
       <div className="mt-16 border-t border-border pt-8 flex flex-wrap gap-4 items-center justify-between">
         <p className="text-[14px] text-muted lowercase">interested in working together?</p>

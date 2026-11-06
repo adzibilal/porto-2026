@@ -1,47 +1,18 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import TextReveal from "./TextReveal";
+import ProjectThumb from "./ProjectThumb";
+import { projects, type Project } from "@/data/projects";
 
 gsap.registerPlugin(ScrollTrigger);
-
-type Project = {
-  slug: string;
-  title: string;
-  desc: string;
-  tags: string[];
-  image: string;
-  url: string;
-  problem?: string;
-  approach?: string;
-  result?: string;
-  images?: string[];
-};
 
 /** a project earns a detail page once it has any case-study content */
 function hasDetail(p: Project) {
   return !!(p.problem || p.approach || p.result || p.images?.length);
-}
-
-function SkeletonCard() {
-  return (
-    <div className="project-card border border-border rounded-[14px] overflow-hidden animate-pulse">
-      <div className="aspect-video bg-[#1c1c1c]" />
-      <div className="p-5 space-y-3">
-        <div className="h-5 bg-[#1c1c1c] rounded w-3/4" />
-        <div className="h-3 bg-[#1c1c1c] rounded w-full" />
-        <div className="flex gap-2">
-          <div className="h-5 bg-[#1c1c1c] rounded-full w-16" />
-          <div className="h-5 bg-[#1c1c1c] rounded-full w-20" />
-          <div className="h-5 bg-[#1c1c1c] rounded-full w-14" />
-        </div>
-      </div>
-    </div>
-  );
 }
 
 function Card({ p }: { p: Project }) {
@@ -51,12 +22,8 @@ function Card({ p }: { p: Project }) {
 
   const body = (
     <>
-      <div className="relative aspect-video bg-[repeating-linear-gradient(45deg,#1c1c1c,#1c1c1c_10px,#181818_10px,#181818_20px)] flex items-center justify-center font-mono text-[11px] text-subtle overflow-hidden">
-        {p.image ? (
-          <Image src={p.image} alt={p.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, 400px" />
-        ) : (
-          "project screenshot"
-        )}
+      <div className="relative overflow-hidden">
+        <ProjectThumb title={p.title} tags={p.tags} />
         {linked && (
           <div className="absolute inset-0 bg-[rgba(198,255,74,0.9)] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-250">
             <span className="font-sans font-bold text-[#101010] text-[14px] lowercase">
@@ -111,16 +78,6 @@ function Card({ p }: { p: Project }) {
 export default function Work() {
   const sectionRef = useRef<HTMLElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch("/api/projects")
-      .then((r) => (r.ok ? r.json() : []))
-      .then(setProjects)
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -147,7 +104,7 @@ export default function Work() {
       );
     });
     return () => ctx.revert();
-  }, [projects]);
+  }, []);
 
   return (
     <section
@@ -160,14 +117,16 @@ export default function Work() {
           <h2 className="font-heading font-semibold text-[clamp(24px,3vw,28px)] text-white lowercase">
             selected work
           </h2>
-          <span className="text-[13px] text-muted lowercase">{String(projects.length).padStart(2, "0")} projects</span>
+          <span className="text-[13px] text-muted lowercase">
+            {String(projects.length).padStart(2, "0")} projects
+          </span>
         </div>
       </TextReveal>
 
       <div ref={cardsRef} className="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] gap-6">
-        {loading
-          ? Array.from({ length: 3 }).map((_, i) => <SkeletonCard key={i} />)
-          : projects.map((p) => <Card key={p.slug || p.title} p={p} />)}
+        {projects.map((p) => (
+          <Card key={p.slug} p={p} />
+        ))}
       </div>
     </section>
   );
